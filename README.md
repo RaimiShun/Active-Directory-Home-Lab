@@ -48,3 +48,12 @@ I implemented departmental file sharing to simulate a corporate environment.
 * **Issue:** Encountered a "Version Mismatch" where Windows 11 Home could not join a domain.
 * **Solution:** Successfully upgraded the VM to Windows 11 Pro to enable enterprise features.
 * **Security:** Implemented Account Lockout Policies to mitigate brute-force attacks.
+
+---
+
+## **Future Enhancements**
+To further expand this lab and simulate a more complex enterprise environment, I plan to implement:
+* **Group Policy Objects (GPOs):** Automating security configurations such as wallpaper restrictions, disabling USB ports, and enforcing password complexity.
+* **WSUS (Windows Server Update Services):** Setting up a centralized server to manage and distribute patches and updates to all workstations in the domain.
+* **Splunk/SIEM Integration:** Installing a Universal Forwarder on the Windows machines to ship logs to a SIEM for real-time security monitoring and threat detection.
+* **VPN & Remote Access:** Configuring a Routing and Remote Access Service (RRAS) to simulate secure remote work connections.
