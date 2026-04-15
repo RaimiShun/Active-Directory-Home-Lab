@@ -23,38 +23,55 @@ To ensure security and isolation, I implemented a dual-adapter network topology.
 * I deployed Windows Server 2022 as a Domain Controller for the LAB.local forest.
 * Created a custom Organizational Unit (OU) named "Accounts" to organize staff members.
 * Provisioned domain users with standardized naming conventions.
+<img width="1028" height="785" alt="AD_Users" src="https://github.com/user-attachments/assets/c4173761-8e28-418e-89f8-eb27ac1b6788" />
+
 * **Advanced OU Design:** Developed a scalable Organizational Unit (OU) structure consisting of departmental containers (Finance, IT, HR) to allow for granular GPO application.
 * **Security Group Management:** Centralized all Security Groups into a deidicated "Groups" OU to separate access permissions from uses objects.
 
-<img width="1028" height="785" alt="AD_Users" src="https://github.com/user-attachments/assets/c4173761-8e28-418e-89f8-eb27ac1b6788" />
 <img width="512" height="389" alt="ADUC" src="https://github.com/user-attachments/assets/4ee90796-bd2a-41e9-9248-609b8adb3601" />
 
 
 
-## **Phase 3: Client Integration & DNS Resolution**
-* The Windows 11 Pro workstation was successfully integrated into the domain.
-* DNS Configuration: Manually pointed the client to the Domain Controller's IP to ensure proper name resolution.
-* Domain Join: Verified the trust relationship between the client and server.
+## **Phase 3: Domain Integration & Network Services Upgrade**
+* **Domain Handshake:** Successfully integrated the Windows 11 Pro workstation into the `Lab.local` forest.
 
-<img width="512" height="380" alt="sysdm cpl_System_Properties" src="https://github.com/user-attachments/assets/da4f4383-0073-43c3-9c47-d815c5c416af" />
-<img width="512" height="388" alt="IPConfig" src="https://github.com/user-attachments/assets/b4423007-5d3b-4e7f-aae3-ba7d91173d83" />
+* **Trust Verification:** Utilized `sysdm.cpl ` to verify the trust relationship between the client and the Domain Controller.
+<img width="1019" height="770" alt="Screenshot 2026-04-16 021037" src="https://github.com/user-attachments/assets/d12d04fc-bf09-4a27-849a-154be0d4966e" />
 
+* **Transition to Automated Networking:** Migrated the client from a static configuration to a dynamic DHCP-managed environment. As shown in the `ipconfig` results, the client now automatically receives its IP allocation and DNS pointers from the Domain Controller, ensuring centralized network management.
+<img width="511" height="385" alt="Screenshot 2026-04-16 011944" src="https://github.com/user-attachments/assets/0fc28295-5dc7-4d60-a485-0fc4e1827690" />
 
 
 ## **Phase 4: Resource Management (The "Help Desk" Scenario)**
 I implemented departmental file sharing to simulate a corporate environment using a combination of GPO and scripting. 
 
 * **Folder Permissions:** Configured NTFS and Share permissions to restrict access based on security groups.
-* **Mapped Drives:** Verified that the Finance user automatically received the correct network drive upon login.
-* **Automated Drive Mapping:** Authored and deployed **.bat** logon scripts via Group Policy to dynamically map the **A:**, **B:** drive based on the user's specific department.
-* **Security Isolation**: Verified that while the drive is mapped via GPO, users are strictly blocked from accesing the folders outside their assigned security group.
+* **Mapped Drives:** Verified that the IT user automatically received the correct network drive upon login.
+<img width="1022" height="775" alt="Screenshot 2026-04-16 023656" src="https://github.com/user-attachments/assets/6f797efb-e9d6-4ddd-8fb8-ffac5c10e076" />
 
-<img width="515" height="389" alt="Mapped_Drive" src="https://github.com/user-attachments/assets/506b3694-414b-43d7-97d4-a95908313d1d" />
+* **Automated Drive Mapping:** Authored and deployed `.bat` logon scripts via Group Policy to dynamically map the `B:` drive based on the user's specific department.
 <img width="1025" height="780" alt="logon_propertities" src="https://github.com/user-attachments/assets/f043dff9-853d-4e3a-aeac-f166b3080b44" />
 <img width="1019" height="773" alt="script" src="https://github.com/user-attachments/assets/29304439-ce85-47cd-9308-684fae8337b4" />
-<img width="512" height="386" alt="Screenshot 2026-04-15 155231" src="https://github.com/user-attachments/assets/7ee2d3f2-947e-4a13-a3cd-554fbc2dd7e6" />
 <img width="1025" height="772" alt="Screenshot 2026-04-15 154914" src="https://github.com/user-attachments/assets/7fe0b71f-fb9d-46c3-a876-6b8b316f54e3" />
 
+* **Security Isolation**: Verified that while the drive is mapped via GPO, users are strictly blocked from accesing the folders outside their assigned security group.
+<img width="1024" height="773" alt="Screenshot 2026-04-16 030320" src="https://github.com/user-attachments/assets/ae4a29bd-2728-48e3-8132-5603cb0dbd44" />
+
+
+## **Phase 5: Network Services & Security Hardening**
+To transition the lab from a basic setup to a secure enterprise environment, I implemented critical infrastructure services and defensive policies.
+
+* **DHCP Server Deployment:** Configured a managed DHCP scope on the Domain Controller. Verified successful IP allocation (192.168.56.103) to the Windows 11 client via the DHCP Lease console and client-side `ipconfig` verification.
+<img width="1026" height="778" alt="Screenshot 2026-04-16 011442" src="https://github.com/user-attachments/assets/e86d8545-fb50-4c87-bc14-9a9e6028a9c8" />
+<img width="511" height="385" alt="Screenshot 2026-04-16 011944" src="https://github.com/user-attachments/assets/e6e35335-41c0-4f98-ae4f-18ea4be55be0" />
+
+
+* **Brute-Force Protection:** Authored a "Security_Hardening_Policy" GPO to enforce an **Account Lockout Threshold** of 3 attempts.
+<img width="1029" height="777" alt="Screenshot 2026-04-16 012238" src="https://github.com/user-attachments/assets/359a1ba4-9257-4bc7-8557-4d7604b5ea2a" />
+
+
+* **Defensive Verification:** Successfully triggered and verified a lockout event on the Windows 11 workstation after multiple failed authentication attempts, simulating a real-world response to a brute-force attack.
+<img width="1032" height="777" alt="Screenshot 2026-04-16 012354" src="https://github.com/user-attachments/assets/d0a8e517-6988-47c7-9d7c-45f56b98f62d" />
 
 
 ## **Key Takeaways & Troubleshooting**
