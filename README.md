@@ -26,14 +26,14 @@ To ensure security and isolation, I implemented a dual-adapter network topology.
 <img width="1028" height="785" alt="AD_Users" src="https://github.com/user-attachments/assets/c4173761-8e28-418e-89f8-eb27ac1b6788" />
 
 * **Advanced OU Design:** Developed a scalable Organizational Unit (OU) structure consisting of departmental containers (Finance, IT, HR) to allow for granular GPO application.
-* **Security Group Management:** Centralized all Security Groups into a deidicated "Groups" OU to separate access permissions from uses objects.
+* **Security Group Management:** Centralized all Security Groups into a dedicated "Groups" OU to separate access permissions from user objects.
 
 <img width="512" height="389" alt="ADUC" src="https://github.com/user-attachments/assets/4ee90796-bd2a-41e9-9248-609b8adb3601" />
 
 
 
 ## **Phase 3: Domain Integration & Network Services Upgrade**
-* **Domain Handshake:** Successfully integrated the Windows 11 Pro workstation into the `Lab.local` forest.
+* **Domain Handshake:** Successfully integrated the Windows 11 Pro workstation into the `LAB.local` forest.
 
 * **Trust Verification:** Utilized `sysdm.cpl ` to verify the trust relationship between the client and the Domain Controller.
 <img width="1019" height="770" alt="Screenshot 2026-04-16 021037" src="https://github.com/user-attachments/assets/d12d04fc-bf09-4a27-849a-154be0d4966e" />
@@ -54,7 +54,7 @@ I implemented departmental file sharing to simulate a corporate environment usin
 <img width="1019" height="773" alt="script" src="https://github.com/user-attachments/assets/29304439-ce85-47cd-9308-684fae8337b4" />
 <img width="1025" height="772" alt="Screenshot 2026-04-15 154914" src="https://github.com/user-attachments/assets/7fe0b71f-fb9d-46c3-a876-6b8b316f54e3" />
 
-* **Security Isolation**: Verified that while the drive is mapped via GPO, users are strictly blocked from accesing the folders outside their assigned security group.
+* **Security Isolation**: Verified that while the drive is mapped via GPO, users are strictly blocked from accessing the folders outside their assigned security group.
 <img width="1024" height="773" alt="Screenshot 2026-04-16 030320" src="https://github.com/user-attachments/assets/ae4a29bd-2728-48e3-8132-5603cb0dbd44" />
 
 
