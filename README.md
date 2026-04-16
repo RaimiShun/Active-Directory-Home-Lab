@@ -39,14 +39,12 @@ To ensure security and isolation, I implemented a dual-adapter network topology.
 
 
 
-## **Phase 3: Domain Integration & Network Services Upgrade**
+## **Phase 3: Domain Integration & Identity Validation**
 * **Domain Handshake:** Successfully integrated the Windows 11 Pro workstation into the `LAB.local` forest.
 
 * **Trust Verification:** Utilized `sysdm.cpl ` to verify the trust relationship between the client and the Domain Controller.
 <img width="1019" height="770" alt="Screenshot 2026-04-16 021037" src="https://github.com/user-attachments/assets/d12d04fc-bf09-4a27-849a-154be0d4966e" />
 
-* **Transition to Automated Networking:** Migrated the client from a static configuration to a dynamic DHCP-managed environment. As shown in the `ipconfig` results, the client now automatically receives its IP allocation and DNS pointers from the Domain Controller, ensuring centralized network management.
-<img width="511" height="385" alt="Screenshot 2026-04-16 011944" src="https://github.com/user-attachments/assets/0fc28295-5dc7-4d60-a485-0fc4e1827690" />
 
 
 ## **Phase 4: Resource Management (The "Help Desk" Scenario)**
@@ -70,8 +68,9 @@ To transition the lab from a basic setup to a secure enterprise environment, I i
 
 * **DHCP Server Deployment:** Configured a managed DHCP scope on the Domain Controller. Verified successful IP allocation (192.168.56.103) to the Windows 11 client via the DHCP Lease console and client-side `ipconfig` verification.
 <img width="1026" height="778" alt="Screenshot 2026-04-16 011442" src="https://github.com/user-attachments/assets/e86d8545-fb50-4c87-bc14-9a9e6028a9c8" />
-<img width="511" height="385" alt="Screenshot 2026-04-16 011944" src="https://github.com/user-attachments/assets/e6e35335-41c0-4f98-ae4f-18ea4be55be0" />
 
+* **Transition to Automated Networking:** Migrated the client from a static configuration to a dynamic DHCP-managed environment. As shown in the `ipconfig` results, the client now automatically receives its IP allocation and DNS pointers from the Domain Controller, ensuring centralized network management.
+<img width="511" height="385" alt="Screenshot 2026-04-16 011944" src="https://github.com/user-attachments/assets/0fc28295-5dc7-4d60-a485-0fc4e1827690" />
 
 * **Brute-Force Protection:** Authored a "Security_Hardening_Policy" GPO to enforce an **Account Lockout Threshold** of 3 attempts.
 <img width="1029" height="777" alt="Screenshot 2026-04-16 012238" src="https://github.com/user-attachments/assets/359a1ba4-9257-4bc7-8557-4d7604b5ea2a" />
