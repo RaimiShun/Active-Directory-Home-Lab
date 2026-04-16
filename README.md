@@ -9,6 +9,13 @@ The goal of this project was to build a functional, secure enterprise network en
 * **Operating Systems:** Windows Server 2022, Windows 11 Pro
 * **Services:** Active Directory Domain Services (AD DS), DNS, SMB File Sharing, Group Policy (GPO)
 
+## **Lab Asset Inventory**
+| Asset Name | Operating System | Role / Service | Network Configuration |
+| :--- | :--- | :--- | :--- |
+| **LAB-DC01** | Windows Server 2022 | Domain Controller, DNS, DHCP | Static: 192.168.56.10 |
+| **LAB-WS01** | Windows 11 Pro | Client Workstation | DHCP Assigned |
+| **S: Drive** | SMB Share | Centralized User Backups | Hosted on DC01 |
+
 
 ## **Phase 1: Network Architecture** 
 To ensure security and isolation, I implemented a dual-adapter network topology.
@@ -74,13 +81,14 @@ To transition the lab from a basic setup to a secure enterprise environment, I i
 <img width="1032" height="777" alt="Screenshot 2026-04-16 012354" src="https://github.com/user-attachments/assets/d0a8e517-6988-47c7-9d7c-45f56b98f62d" />
 
 
-## **Phase 6: Application Support & Disaster Recovery (The "Help Desk" Mission)**
-To simulate a Junior IT Engineer's daily responsibilities, I managed a local mail infrastructure and implemented a disaster recovery plan for end-user data.
+## **Phase 6: Application Support & Disaster Recovery**
+To simulate a Junior IT Engineer's daily responsibilities, I managed a local mail infrastructure and implemented a platform-agnostic disaster recovery plan for end-user data. 
+
+* **Logic-Based Troubleshooting:** Demonstrated that technical support principles are transferable across platforms. While utilizing Thunderbird for this lab, the methodology applied (Profile Management and Configuration File manipulation) directly simulates enterprise Microsoft Outlook troubleshooting (e.g., resolving .PST/.OST corruption).
 
 * **Advanced Troubleshooting (Root Cause Analysis):** Successfully simulated and resolved a "Corrupt Profile" failure. By identifying and manipulating the `profiles.ini` (Configuration Settings) file, I demonstrated the ability to restore application functionality without data loss, bypassing the need for a full re-install.
 <img width="1023" height="771" alt="Simulated_Profile_Failure_eml" src="https://github.com/user-attachments/assets/4720af1b-51bd-48f0-a491-8df4416317d0" />
 <img width="1024" height="770" alt="Successful_Recovery_eml" src="https://github.com/user-attachments/assets/2f4df36b-bfd3-4049-9efe-e76908e9379a" />
-
 
 * **Data Migration & Redundancy:** Executed a manual migration of local application databases (AppData/Roaming) from the Windows 11 workstation to a cross-platform **Shared Drive (S: Drive)** hosted on the Domain Controller.
 
