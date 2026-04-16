@@ -74,13 +74,31 @@ To transition the lab from a basic setup to a secure enterprise environment, I i
 <img width="1032" height="777" alt="Screenshot 2026-04-16 012354" src="https://github.com/user-attachments/assets/d0a8e517-6988-47c7-9d7c-45f56b98f62d" />
 
 
+## **Phase 6: Application Support & Disaster Recovery (The "Help Desk" Mission)**
+To simulate a Junior IT Engineer's daily responsibilities, I managed a local mail infrastructure and implemented a disaster recovery plan for end-user data.
+
+* **Advanced Troubleshooting (Root Cause Analysis):** Successfully simulated and resolved a "Corrupt Profile" failure. By identifying and manipulating the `profiles.ini` (Configuration Settings) file, I demonstrated the ability to restore application functionality without data loss, bypassing the need for a full re-install.
+<img width="1023" height="771" alt="Simulated_Profile_Failure_eml" src="https://github.com/user-attachments/assets/4720af1b-51bd-48f0-a491-8df4416317d0" />
+<img width="1024" height="770" alt="Successful_Recovery_eml" src="https://github.com/user-attachments/assets/2f4df36b-bfd3-4049-9efe-e76908e9379a" />
+
+
+* **Data Migration & Redundancy:** Executed a manual migration of local application databases (AppData/Roaming) from the Windows 11 workstation to a cross-platform **Shared Drive (S: Drive)** hosted on the Domain Controller.
+
+* **Archival Compliance:** Built a structured archival hierarchy (`2025_Executive_Archive`) and validated the ingestion of "orphan" data files (`.eml`) into the local mail database.
+<img width="1023" height="771" alt="Archival_Compliance" src="https://github.com/user-attachments/assets/71bf99db-d81d-473b-8c6e-2ffcc7382f11" />
+
+
+
 ## **Key Takeaways & Troubleshooting**
 * **Issue:** Encountered a "Version Mismatch" where Windows 11 Home could not join a domain.
 *   **Solution:** Successfully upgraded the VM to Windows 11 Pro to enable enterprise features.
 * **Issue:** Kerberos Time Skew. Encountered an error where the computer clock was not synchronized with the Domain Controller.
-*   **Solution**: Identified a VM clock drift mismatch and utilized **w32tm /resync** to align the client with the DC's NTP source
+*   **Solution**: Identified a VM clock drift mismatch and utilized `w32tm /resync` to align the client with the DC's NTP source
 * **Security:** Implemented Account Lockout Policies to mitigate brute-force attacks.
+* **Issue:** Application setup blocked by non-standard network environment (Thunderbird Wizard)
+*   **Solution:** Utilized the Profile Manager (`P` flag) and Advanced Configuration toggles to initialize the application database manually, ensuring laboratory tasks could proceed despite UI limitations.
 
+  
 ---
 
 ## **Future Enhancements**
