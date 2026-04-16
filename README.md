@@ -95,6 +95,24 @@ To simulate a Junior IT Engineer's daily responsibilities, I managed a local mai
 * **Archival Compliance:** Built a structured archival hierarchy (`2025_Executive_Archive`) and validated the ingestion of "orphan" data files (`.eml`) into the local mail database.
 <img width="1023" height="771" alt="Archival_Compliance" src="https://github.com/user-attachments/assets/71bf99db-d81d-473b-8c6e-2ffcc7382f11" />
 
+## **Phase 7: Governance, Monitoring & Incident Response**
+To transition from a "working" lab to a "managed" enterprise environment, I implemented a maintenance and security monitoring framework to ensure high availability and audit compliance.
+
+* **Domain Health Diagnostics:** Executed `dcdiag` to verify the health of the `LAB.local` forest. Confirmed successful status for core services including **Connectivity**, **Advertising**, **MachineAccount**, and **NetLogons**.
+<img width="1026" height="767" alt="Screenshot 2026-04-16 231227" src="https://github.com/user-attachments/assets/45ec4a6b-ad5a-4bba-ac13-e7f5fea3cc4d" />
+<img width="1021" height="774" alt="Screenshot 2026-04-16 231702" src="https://github.com/user-attachments/assets/acdf0c81-43c6-4af5-9e5b-90945d69a770" />
+<img width="1028" height="770" alt="Screenshot 2026-04-16 231855" src="https://github.com/user-attachments/assets/8009089f-07d8-4a41-8c8c-a19d66e7e013" />
+
+
+* **Advanced Security Auditing:** Structured Active Directory Organizational Units (OUs) to enforce **Advanced Audit Policies**. By moving the workstation from a default container to a managed OU, I enabled granular tracking of authentication events.
+* **Incident Capture & Log Correlation:** Successfully simulated a brute-force attack and validated the detection of **Event ID 4625** (Logon Failure) on the Windows 11 endpoint, correlating it with **Event ID 4740** (Account Lockout) on the Domain Controller.
+<img width="1021" height="771" alt="Screenshot 2026-04-17 004607" src="https://github.com/user-attachments/assets/21c89942-22fd-4538-9131-bb0cbea401fa" />
+<img width="1006" height="783" alt="Screenshot 2026-04-17 004825" src="https://github.com/user-attachments/assets/85b185d4-7d02-4d01-b8e9-9db47eda954a" />
+
+
+* **Performance Baselining:** Utilized Windows Resource Monitor to baseline CPU, Disk, and Network throughput. Verified server stability during active file-share utilization and high-volume data transfers.
+<img width="1024" height="783" alt="Screenshot 2026-04-17 005119" src="https://github.com/user-attachments/assets/414bd24a-452f-4d9b-846c-c048f2ef9edd" />
+
 
 
 ## **Key Takeaways & Troubleshooting**
@@ -105,7 +123,11 @@ To simulate a Junior IT Engineer's daily responsibilities, I managed a local mai
 * **Security:** Implemented Account Lockout Policies to mitigate brute-force attacks.
 * **Issue:** Application setup blocked by non-standard network environment (Thunderbird Wizard)
 *   **Solution:** Utilized the Profile Manager (`P` flag) and Advanced Configuration toggles to initialize the application database manually, ensuring laboratory tasks could proceed despite UI limitations.
-
+* **Issue:** GPO settings (Audit Policies) were not applying to the Windows 11 workstation.
+    * **Root Cause:** The workstation was located in the default "Computers" container, which does not support GPO linking.
+    * **Solution:** Created a dedicated Workstation OU, moved the computer object, and performed a `gpupdate /force` to successfully trigger policy inheritance.
+* **Issue:** Event Viewer GUI "Query Timeout" or hang on the client machine.
+    * **Solution:** Pivoted to PowerShell-based forensics using `Get-EventLog` to bypass GUI limitations and extract security data directly from the `.evtx` buffer.
   
 ---
 
