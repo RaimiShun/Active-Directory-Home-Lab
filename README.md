@@ -4,10 +4,20 @@ A functional Windows Server 2022 and Windows 11 enterprise lab environment.
 ## **Objective**
 The goal of this project was to build a functional, secure enterprise network environment using Oracle VirtualBox. This lab simulates a real-world corporate infrastructure, focusing on identity management, network configuration, and security principles like Least Privilege.
 
+## **Core Competencies**
+| Competency Area | Key Technologies & Skills |
+| :--- | :--- |
+| **Identity & Access** | Active Directory (AD DS), OU Design, Group Policy (GPO) |
+| **Security & Auditing** | Account Lockout Policies, NTFS/Share Permissions, Hardening |
+| **SIEM & Monitoring** | Splunk Enterprise, Universal Forwarder, Sysmon, Log Correlation |
+| **Infrastructure** | DHCP, DNS, Network Mapping, Virtualization (Oracle VM) |
+| **Incident Response** | Root Cause Analysis, Forensics, Log Aggregation, Troubleshooting |
+
 ## **Technologies Used**
 * **Hypervisor:** Oracle VirtualBox
 * **Operating Systems:** Windows Server 2022, Windows 11 Pro
 * **Services:** Active Directory Domain Services (AD DS), DNS, SMB File Sharing, Group Policy (GPO)
+* **Monitoring/SIEM:** Splunk Enterprise (Indexer), Splunk Universal Forwarder (Agent)
 
 ## **Lab Asset Inventory**
 | Asset Name | Operating System | Role / Service | Network Configuration |
@@ -112,27 +122,71 @@ To transition from a "working" lab to a "managed" enterprise environment, I impl
 * **Performance Baselining:** Utilized Windows Resource Monitor to baseline CPU, Disk, and Network throughput. Verified server stability during active file-share utilization and high-volume data transfers.
 <img width="1024" height="783" alt="Screenshot 2026-04-17 005119" src="https://github.com/user-attachments/assets/414bd24a-452f-4d9b-846c-c048f2ef9edd" />
 
+## **Phase 8: SIEM Integration & Real-Time Monitoring**
+To transition from reactive troubleshooting to proactive monitoring, I deployed a Splunk SIEM environment to centralize logs from across the domain. 
+
+## **Indexer Setup (Server VM)**
+* **Networking:** Enabled TCP 9997 to receive data from the Universal Forwarder
+<img width="1023" height="773" alt="Splunk_Indexer_Setup" src="https://github.com/user-attachments/assets/f73e062c-4d95-4061-ac94-72d276b555a0" />
+
+* **Configuration:** Manually tuned `inputs.conf` to monitor local Security, System, and Application logs, providing 100% visibility into Domain Controller activity.
+<img width="1025" height="768" alt="Screenshot 2026-04-18 221938" src="https://github.com/user-attachments/assets/9f1422fb-f3ee-4685-ad8a-5dced0bc049a" />
+
+
+* **Endpoint Agent (Windows 11 VM):** Deployed the Splunk Universal Forwarder. Configured the agent to push Windows Event Logs (Security, System, Application) to the Indexer.
+<img width="1026" height="770" alt="Screenshot 2026-04-18 221557" src="https://github.com/user-attachments/assets/fa55cfe2-dd05-41b0-b79a-cda136b44b06" />
+
+
+* **Data Pipeline Verfication:** Confirmed active data flow by quering `index=main` and verifying the presence of both `LAB-DC01` and `LAB-WS01` as active hosts.
+<img width="1022" height="767" alt="Screenshot 2026-04-18 201315" src="https://github.com/user-attachments/assets/ce07cc56-8baf-4103-a574-9c5876a873f5" />
+
+## **Case Study: Incident Response (The "Locked-Out User")**
+**Scenario:** A user reports they are locked out of their workstation. As a Junior IT Engineer, I used the SIEM to perform a Root Cause Analysis. 
+
+## **Detection** 
+I queried Splunk for `EventCode=4740`. This instantly identified that the account `IT_Admin` was locked out by the Domain Controller. 
+<img width="1022" height="772" alt="Splunk_Scenario_2" src="https://github.com/user-attachments/assets/fc09a027-2c5d-4544-89a3-3e3b1e3d7c24" />
+<img width="1021" height="773" alt="Splunk_Scenario_1" src="https://github.com/user-attachments/assets/57b93861-bef4-48e2-b5b3-b51183d817fc" />
+
+## **Forensics**
+By analyzing `EventCode=4625` (Logon Failure), I confirmed the source was the Windows 11 workstation. This allowed me to rule out a network-wide attack and focus on the local machine.
+<img width="1023" height="776" alt="Splunk_Scenario_3" src="https://github.com/user-attachments/assets/006e868e-7442-47c4-99c2-0a28c462bacb" />
+
+## **Resolution** 
+I performed a manual account unlock in Active Directory and verified the user could re-authenticate successfully.
+<img width="1015" height="773" alt="Splunk_Scenario_4" src="https://github.com/user-attachments/assets/2f1ea630-9897-4530-bb01-f8c628266286" />
+
 
 
 ## **Key Takeaways & Troubleshooting**
 * **Issue:** Encountered a "Version Mismatch" where Windows 11 Home could not join a domain.
-*   **Solution:** Successfully upgraded the VM to Windows 11 Pro to enable enterprise features.
+   *   **Solution:** Successfully upgraded the VM to Windows 11 Pro to enable enterprise features.
+
 * **Issue:** Kerberos Time Skew. Encountered an error where the computer clock was not synchronized with the Domain Controller.
-*   **Solution**: Identified a VM clock drift mismatch and utilized `w32tm /resync` to align the client with the DC's NTP source
-* **Security:** Implemented Account Lockout Policies to mitigate brute-force attacks.
+   *   **Solution**: Identified a VM clock drift mismatch and utilized `w32tm /resync` to align the client with the DC's NTP source
+      * **Security:** Implemented Account Lockout Policies to mitigate brute-force attacks.
+       
 * **Issue:** Application setup blocked by non-standard network environment (Thunderbird Wizard)
-*   **Solution:** Utilized the Profile Manager (`P` flag) and Advanced Configuration toggles to initialize the application database manually, ensuring laboratory tasks could proceed despite UI limitations.
+   *   **Solution:** Utilized the Profile Manager (`P` flag) and Advanced Configuration toggles to initialize the application database manually, ensuring laboratory tasks could proceed despite UI limitations.
+
 * **Issue:** GPO settings (Audit Policies) were not applying to the Windows 11 workstation.
-    * **Root Cause:** The workstation was located in the default "Computers" container, which does not support GPO linking.
-    * **Solution:** Created a dedicated Workstation OU, moved the computer object, and performed a `gpupdate /force` to successfully trigger policy inheritance.
+    * **Root Cause:** The workstation was located in the default "Computers" container, which does not                            support GPO linking.
+    * **Solution:** Created a dedicated Workstation OU, moved the computer object, and performed a                              `gpupdate /force` to successfully trigger policy inheritance.
+      
 * **Issue:** Event Viewer GUI "Query Timeout" or hang on the client machine.
-    * **Solution:** Pivoted to PowerShell-based forensics using `Get-EventLog` to bypass GUI limitations and extract security data directly from the `.evtx` buffer.
+    * **Solution:** Pivoted to PowerShell-based forensics using `Get-EventLog` to bypass GUI limitations                        and extract security data directly from the `.evtx` buffer.
+   
+* **Issue:** Splunk CLI returned "parameter name: path must be a file or directory" when adding monitors.
+   * **Root Cause:** The CLI was misinterpreting the Windows Event Log provider as a local file path.
+   * **Solution:** Pivoted to manual configuration by authoring a custom `inputs.conf` file in                                 `etc/system/local`, ensuring proper ingestion of the Windows Security buffer.
+ 
+* **Issue:** "Local Event Log Collection" UI returned a 404 error on the Server VM.
+   *    **Solution:** Bypassed the GUI limitation by manually editing the server-side configuration files             and restarting the Splunk service via CLI to force-enable local log indexing. 
   
 ---
 
 ## **Future Enhancements**
-To further expand this lab and simulate a more complex enterprise environment, I plan to implement:
-* **Item-Level Targeting:** Consolidating multiple department rules into a single, high-effciency GPO.
-* **WSUS (Windows Server Update Services):** Setting up a centralized server to manage and distribute patches and updates to all workstations in the domain.
-* **Splunk/SIEM Integration:** Installing a Universal Forwarder on the Windows machines to ship logs to a SIEM for real-time security monitoring and threat detection.
-* **VPN & Remote Access:** Configuring a Routing and Remote Access Service (RRAS) to simulate secure remote work connections.
+To further expand this lab, I plan to implement:
+* **[Item-Level Targeting](docs/GPO_Optimization.md):** Consolidating multiple department rules into a single, high-efficiency GPO.
+* **[WSUS Deployment](docs/WSUS_Plan.md):** Setting up a centralized server to manage and distribute patches.
+* **[VPN & Remote Access](docs/VPN_Configuration.md):** Configuring a Routing and Remote Access Service (RRAS) to simulate secure remote work.
