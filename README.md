@@ -22,7 +22,7 @@ The goal of this project was to build a functional, secure enterprise network en
 ## **Lab Asset Inventory**
 | Asset Name | Operating System | Role / Service | Network Configuration |
 | :--- | :--- | :--- | :--- |
-| **LAB-DC01** | Windows Server 2022 | Domain Controller, DNS, DHCP | Static: 192.168.56.10 |
+| **LAB-DC01** | Windows Server 2022 | Domain Controller, DNS, DHCP, WSUS | Static: 192.168.56.10 |
 | **LAB-WS01** | Windows 11 Pro | Client Workstation | DHCP Assigned |
 | **S: Drive** | SMB Share | Centralized User Backups | Hosted on DC01 |
 
@@ -156,6 +156,23 @@ By analyzing `EventCode=4625` (Logon Failure), I confirmed the source was the Wi
 I performed a manual account unlock in Active Directory and verified the user could re-authenticate successfully.
 <img width="1015" height="773" alt="Splunk_Scenario_4" src="https://github.com/user-attachments/assets/2f1ea630-9897-4530-bb01-f8c628266286" />
 
+## **Phase 9: Patch Management & Compliance (WSUS)**
+To transition the lab from an "unmanaged" environment to a governed enterprise network, I deployed **Windows Server Update Services (WSUS)** on the Domain Controller.
+
+* **Policy-Driven Updates (GPO):** Configured Group Policy Objects to redirect the workstation to the local update server. As shown in the client-side view, the "managed" status is verified by the system blocking manual user overrides.
+<img width="1022" height="772" alt="Screenshot 2026-04-23 153748" src="https://github.com/user-attachments/assets/33dc9617-9d7d-49b7-9bd3-004eb0cd469c" />
+
+
+* **Centralized Administration:** Utilized the WSUS console to organize assets into a dedicated `Lab_Workstations` group. Successfully synchronized 335 updates, achieving a 99% patch compliance rate across the domain.
+<img width="1019" height="773" alt="Screenshot 2026-04-23 154418" src="https://github.com/user-attachments/assets/c816b4c9-e744-47f7-bae9-cca8b415e7b2" />
+
+
+* **Infrastructure Troubleshooting & Reporting:** Resolved a critical dependency issue involving legacy SQL CLR and Report Viewer runtimes on Server 2022. This enabled the generation of "Computer Detailed Status Reports," providing actionable security audits for stakeholders.
+<img width="1023" height="772" alt="Screenshot 2026-04-23 162445" src="https://github.com/user-attachments/assets/c0abd013-f72a-4125-b2b2-19513d58f73d" />
+
+
+
+
 
 
 ## **Key Takeaways & Troubleshooting**
@@ -182,11 +199,17 @@ I performed a manual account unlock in Active Directory and verified the user co
  
 * **Issue:** "Local Event Log Collection" UI returned a 404 error on the Server VM.
    *    **Solution:** Bypassed the GUI limitation by manually editing the server-side configuration files             and restarting the Splunk service via CLI to force-enable local log indexing. 
-  
+
+* **Issue:** WSUS Reporting console failed to load on Windows Server 2022.
+   * **Root Cause:** A legacy hard-coded dependency requiring Microsoft Report Viewer 2012, which is not                         included in modern Server OS builds.
+   * **Solution:** Navigated the prerequisite chain by manually installing the SQL Server 2012 System CLR                      Types library followed by the Report Viewer 2012 Runtime, enabling the generation of                        PDF/GUI compliance reports.
+ 
+* **Issue:** Windows 11 client stuck at "Downloading 0%" from the local WSUS server.
+   * **Solution:** Performed a SoftwareDistribution cache reset on the client machine and utilized `wuauclt /reportnow` to force a fresh handshake with the Domain Controller, resolving the hung                       update task.
+
 ---
 
 ## **Future Enhancements**
 To further expand this lab, I plan to implement:
 * **[Item-Level Targeting](docs/GPO_Optimization.md):** Consolidating multiple department rules into a single, high-efficiency GPO.
-* **[WSUS Deployment](docs/WSUS_Plan.md):** Setting up a centralized server to manage and distribute patches.
 * **[VPN & Remote Access](docs/VPN_Configuration.md):** Configuring a Routing and Remote Access Service (RRAS) to simulate secure remote work.
