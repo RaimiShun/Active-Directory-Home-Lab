@@ -93,15 +93,15 @@ To validate that the Principle of Least Privilege was successfully applied beyon
 
 
 ## **Phase 5: Network Services & Security Hardening**
-To transition the lab into a "Hardened" state, I implemented centralized networking and defensive auditing policies.
+To transition the lab into a **"Hardened"** state, I implemented centralized networking and defensive auditing policies.
 
 ### **Centralized Network Management (DHCP)**
 
-* **Managed Infrastructure:** Deployed a managed DHCP Scope (192.168.56.100 - 192.168.56.200) on the Domain Controller to eliminate static IP overhead.
+* **Managed Infrastructure:** Deployed a managed DHCP Scope (`192.168.56.100 - 192.168.56.200`) on the Domain Controller to eliminate static IP overhead.
  
-* **DNS Infrastructure Integration:** Configured DHCP Option 006 (DNS Servers) to automatically assign the Domain Controller’s IP (192.168.56.10) to all network clients. This ensures seamless Active Directory service discovery and reliable Kerberos authentication across the forest.
+* **DNS Infrastructure Integration:** Configured DHCP Option 006 (DNS Servers) to automatically assign the Domain Controller’s IP (`192.168.56.10`) to all network clients. This ensures seamless Active Directory service discovery and reliable Kerberos authentication across the forest.
  
-* **Validation:** Verified the "Handshake" by migrating the Windows 11 client to a dynamic lease.
+* **Validation:** Verified the **"Handshake"** by migrating the **Windows 11** client to a dynamic lease.
 
 <img width="1022" height="766" alt="DHCP Handshake" src="https://github.com/user-attachments/assets/ee4e36af-523e-4b26-88e4-6b419c2858f0" />
 
@@ -110,7 +110,7 @@ To transition the lab into a "Hardened" state, I implemented centralized network
 
 ### **Brute-Force Mitigation & GPO Hardening** 
 
-* **Strategy:** Authored and enforced a "GPO Security Hardening Baseline" to mitigate automated credential-stuffing and brute-force attacks.
+* **Strategy:** Authored and enforced a **"GPO Security Hardening Baseline"** to mitigate automated credential-stuffing and brute-force attacks.
 
 * **Policy Configuration:** Enforced an Account Lockout Threshold of 3 failed attempts with a 30-minute reset window.
 
@@ -119,9 +119,9 @@ To transition the lab into a "Hardened" state, I implemented centralized network
 
 ### **Security Auditing & Incident Simulation**
 
-* **The Attack Simulation:** Triggered a deliberate lockout on the Windows 11 workstation after exceeding the authorized logon attempts.
+* **The Attack Simulation:** Triggered a deliberate lockout on the **Windows 11** workstation after exceeding the authorized logon attempts.
 
-* **The Forensic Chain:** Configured the Audit Account Management policy to track identity-based threats.
+* **The Forensic Chain:** Configured the **Audit Account Management** policy to track identity-based threats.
 
 * **Log Correlation:** Successfully correlated Event ID 4740 in the Domain Controller’s Security Log, proving the "Detection-to-Action" pipeline is fully operational.
 
@@ -132,37 +132,49 @@ To transition the lab into a "Hardened" state, I implemented centralized network
 <img width="1022" height="769" alt="AC Lockout Eventviewer" src="https://github.com/user-attachments/assets/7bd103df-42d4-4af5-b01d-de7809e9702f" />
 
 
-## **Phase 6: Endpoint Engineering & Data Resiliency**
-**Objective:** Simulating Tier 2 support operations by managing application lifecycles and implementing robust Disaster Recovery (DR) workflows for end-user data.
+## **Phase 6: Data Governance & Resiliency**
+**Objective:** Implementing enterprise-grade data protection through automation and surgical recovery methods. 
 
-* **Logic-Based Troubleshooting:** Demonstrated that technical support principles are transferable across platforms. While utilizing Thunderbird for this lab, the methodology applied (Profile Management and Configuration File manipulation) directly simulates enterprise Microsoft Outlook troubleshooting (e.g., resolving .PST/.OST corruption).
+### **Task A: Automated Endpoint Migration**
+* **Action:** Deployed a PowerShell script to migrate "Critical Project" data from local user desktops to the centralized **S: Drive**.
 
-* **Advanced Troubleshooting (Root Cause Analysis):** Successfully simulated and resolved a "Corrupt Profile" failure. By identifying and manipulating the `profiles.ini` (Configuration Settings) file, I demonstrated the ability to restore application functionality without data loss, bypassing the need for a full re-install.
-<img width="1023" height="771" alt="Simulated_Profile_Failure_eml" src="https://github.com/user-attachments/assets/4720af1b-51bd-48f0-a491-8df4416317d0" />
-<img width="1024" height="770" alt="Successful_Recovery_eml" src="https://github.com/user-attachments/assets/2f4df36b-bfd3-4049-9efe-e76908e9379a" />
+* **Impact:** Eliminated local data silos and ensured all business-critical files are included in server-side backup rotations.
 
-* **Data Migration & Redundancy:** Executed a manual migration of local application databases (AppData/Roaming) from the Windows 11 workstation to a cross-platform **Shared Drive (S: Drive)** hosted on the Domain Controller.
+<img width="1021" height="766" alt="Script" src="https://github.com/user-attachments/assets/093bab95-0e5a-4bae-b1dd-ef5c7b97ff40" />
 
-* **Archival Compliance:** Built a structured archival hierarchy (`2025_Executive_Archive`) and validated the ingestion of "orphan" data files (`.eml`) into the local mail database.
-<img width="1023" height="771" alt="Archival_Compliance" src="https://github.com/user-attachments/assets/71bf99db-d81d-473b-8c6e-2ffcc7382f11" />
+### **Task B: Legacy Application Risk Mitigation**
 
-## **Phase 7: Governance, Monitoring & Incident Response**
-To transition from a "working" lab to a "managed" enterprise environment, I implemented a maintenance and security monitoring framework to ensure high availability and audit compliance.
+* **Action:** Identified vulnerable legacy accounting data and migrated it to a **Hidden Administrative Share** (`Secure_Archives$`).
 
-* **Domain Health Diagnostics:** Executed `dcdiag` to verify the health of the `LAB.local` forest. Confirmed successful status for core services including **Connectivity**, **Advertising**, **MachineAccount**, and **NetLogons**.
-<img width="1026" height="767" alt="Screenshot 2026-04-16 231227" src="https://github.com/user-attachments/assets/45ec4a6b-ad5a-4bba-ac13-e7f5fea3cc4d" />
-<img width="1021" height="774" alt="Screenshot 2026-04-16 231702" src="https://github.com/user-attachments/assets/acdf0c81-43c6-4af5-9e5b-90945d69a770" />
-<img width="1028" height="770" alt="Screenshot 2026-04-16 231855" src="https://github.com/user-attachments/assets/8009089f-07d8-4a41-8c8c-a19d66e7e013" />
+* **Impact:** Reduced the attack surface by hiding the share from standard network discovery and enforcing IT-Admin-only access.
+
+<img width="1020" height="769" alt="Legacy migration" src="https://github.com/user-attachments/assets/cf3c023e-da90-42fa-9777-56b4d8870500" />
+
+### **Task C: Disaster Recovery (VSS)**
+
+* **Action:** Configured Volume Shadow Copy Service (VSS) for point-in-time recovery.
+
+* **Impact:** Enabled self-service "Previous Version" restoration, significantly reducing Helpdesk RTO (Recovery Time Objective) for accidental deletions.
+
+<img width="1020" height="774" alt="Shadowcopies" src="https://github.com/user-attachments/assets/e7af4c88-86fe-4a4b-ae1e-fd2b17f341fe" />
+
+<img width="1019" height="769" alt="self-service recovery" src="https://github.com/user-attachments/assets/52bda06a-b728-4675-b7d7-cd9591a0680b" />
 
 
-* **Advanced Security Auditing:** Structured Active Directory Organizational Units (OUs) to enforce **Advanced Audit Policies**. By moving the workstation from a default container to a managed OU, I enabled granular tracking of authentication events.
-* **Incident Capture & Log Correlation:** Successfully simulated a brute-force attack and validated the detection of **Event ID 4625** (Logon Failure) on the Windows 11 endpoint, correlating it with **Event ID 4740** (Account Lockout) on the Domain Controller.
-<img width="1021" height="771" alt="Screenshot 2026-04-17 004607" src="https://github.com/user-attachments/assets/21c89942-22fd-4538-9131-bb0cbea401fa" />
-<img width="1006" height="783" alt="Screenshot 2026-04-17 004825" src="https://github.com/user-attachments/assets/85b185d4-7d02-4d01-b8e9-9db47eda954a" />
+## **Phase 7: Infrastructure Health & Validation**
+**Objective:** Final validation of Domain integrity and performance baselining.
+
+### **Active Directory Health Audit:**
+Executed `dcdiag` to verify forest connectivity, advertising, and replication status. All tests passed.
+
+<img width="1019" height="771" alt="dcdiag" src="https://github.com/user-attachments/assets/bc3fc8cf-e123-4b35-9e8d-4068fea5ba9c" />
 
 
-* **Performance Baselining:** Utilized Windows Resource Monitor to baseline CPU, Disk, and Network throughput. Verified server stability during active file-share utilization and high-volume data transfers.
-<img width="1024" height="783" alt="Screenshot 2026-04-17 005119" src="https://github.com/user-attachments/assets/414bd24a-452f-4d9b-846c-c048f2ef9edd" />
+### **Perfomance Monitoring:**
+Utilized **Resource Monitor** to baseline network and disk I/O, ensuring no bottlenecks exist within the virtualized environment.
+
+<img width="1019" height="766" alt="resmon" src="https://github.com/user-attachments/assets/dfbd871b-fd10-4502-93a2-39cfb43c306a" />
+
 
 ## **Phase 8: SIEM Integration & Real-Time Monitoring**
 To transition from reactive troubleshooting to proactive monitoring, I deployed a Splunk SIEM environment to centralize logs from across the domain. 
@@ -201,15 +213,20 @@ I performed a manual account unlock in Active Directory and verified the user co
 ## **Phase 9: Patch Management & Compliance (WSUS)**
 To transition the lab from an "unmanaged" environment to a governed enterprise network, I deployed **Windows Server Update Services (WSUS)** on the Domain Controller.
 
-* **Policy-Driven Updates (GPO):** Configured Group Policy Objects to redirect the workstation to the local update server. As shown in the client-side view, the "managed" status is verified by the system blocking manual user overrides.
+### **Policy-Driven Updates (GPO):**
+Configured Group Policy Objects to redirect the workstation to the local update server. As shown in the client-side view, the "managed" status is verified by the system blocking manual user overrides.
+
 <img width="1022" height="772" alt="Screenshot 2026-04-23 153748" src="https://github.com/user-attachments/assets/33dc9617-9d7d-49b7-9bd3-004eb0cd469c" />
 
 
-* **Centralized Administration:** Utilized the WSUS console to organize assets into a dedicated `Lab_Workstations` group. Successfully synchronized 335 updates, achieving a 99% patch compliance rate across the domain.
+### **Centralized Administration:** 
+Utilized the WSUS console to organize assets into a dedicated `Lab_Workstations` group. Successfully synchronized 335 updates, achieving a 99% patch compliance rate across the domain.
+
 <img width="1019" height="773" alt="Screenshot 2026-04-23 154418" src="https://github.com/user-attachments/assets/c816b4c9-e744-47f7-bae9-cca8b415e7b2" />
 
+### **Infrastructure Troubleshooting & Reporting:** 
+Resolved a critical dependency issue involving legacy SQL CLR and Report Viewer runtimes on Server 2022. This enabled the generation of "Computer Detailed Status Reports," providing actionable security audits for stakeholders.
 
-* **Infrastructure Troubleshooting & Reporting:** Resolved a critical dependency issue involving legacy SQL CLR and Report Viewer runtimes on Server 2022. This enabled the generation of "Computer Detailed Status Reports," providing actionable security audits for stakeholders.
 <img width="1023" height="772" alt="Screenshot 2026-04-23 162445" src="https://github.com/user-attachments/assets/c0abd013-f72a-4125-b2b2-19513d58f73d" />
 
 
