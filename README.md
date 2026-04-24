@@ -29,69 +29,111 @@ The goal of this project was to build a functional, secure enterprise network en
 
 ## **Phase 1: Network Architecture** 
 To ensure security and isolation, I implemented a dual-adapter network topology.
+
 * **Internal Network (Host-Only):** Dedicated for private communication between the Domain Controller and Client.
+
 * **NAT:** Provided controlled internet access for system updates and software installation.
-<img width="957" height="517" alt="Windows10-Server_Network_Settings" src="https://github.com/user-attachments/assets/f55d0665-537a-446a-a49f-5aab6164df0d" />
-<img width="956" height="518" alt="Windows11_Network_Settings" src="https://github.com/user-attachments/assets/162d16eb-6967-4091-b456-84b929c8c382" />
+<img width="1274" height="1051" alt="Settings" src="https://github.com/user-attachments/assets/fb62ea93-e00d-49c4-9e81-2547e68b29df" />
+
+<img width="1283" height="1096" alt="Settings (2)" src="https://github.com/user-attachments/assets/5e4b179d-9913-417a-9a32-6a419853ec7e" />
+
+
+## **Phase 2: Active Directory Architecture & Identity Design**
+**Objective:** Establishing a scalable, enterprise-grade Identity and Access Management (IAM) foundation within the LAB.local forest.
+
+### **Hierarchical Organizational Unit (OU) Design**
+
+* **Scalable Framework:** Implemented a tiered OU structure to facilitate granular Group Policy application and administrative delegation.
+
+* **Separation of Concerns:** Isolated Administrative Accounts, Standard Accounts (departmentalized by Finance, HR, and IT), and Security Groups into distinct containers to prevent policy leakage.
+
+* **Standardized Provisioning:** Developed an account naming and description convention to simulate enterprise auditing requirements, as seen in the profile for John Wick (Finance Manager).
+
+<img width="1023" height="774" alt="AD UC" src="https://github.com/user-attachments/assets/41251eb9-7c8a-42c7-b25d-5d2b0e54d966" />
 
 
 
-## **Phase 2: Active Directory & User Management**
-* I deployed Windows Server 2022 as a Domain Controller for the LAB.local forest.
-* Created a custom Organizational Unit (OU) named "Accounts" to organize staff members.
-* Provisioned domain users with standardized naming conventions.
-<img width="1028" height="785" alt="AD_Users" src="https://github.com/user-attachments/assets/c4173761-8e28-418e-89f8-eb27ac1b6788" />
+## **Phase 3: Endpoint Enrollment & Trust Validation** 
+**Objective:** Securely integrating client assets into the domain and verifying the Kerberos trust relationship.
 
-* **Advanced OU Design:** Developed a scalable Organizational Unit (OU) structure consisting of departmental containers (Finance, IT, HR) to allow for granular GPO application.
-* **Security Group Management:** Centralized all Security Groups into a dedicated "Groups" OU to separate access permissions from user objects.
+* **Domain Handshake:** Successfully migrated the Windows 11 Pro workstation from a standalone workgroup to the LAB.local managed forest.
 
-<img width="512" height="389" alt="ADUC" src="https://github.com/user-attachments/assets/4ee90796-bd2a-41e9-9248-609b8adb3601" />
+* **Security Validation:** Utilized sysdm.cpl to verify the authoritative trust relationship between the endpoint (WS01.LAB.local) and the Domain Controller.
 
+* **Identity Handshake:** Confirmed that the workstation successfully honors domain credentials, allowing for centralized authentication and policy inheritance from the DC.
 
-
-## **Phase 3: Domain Integration & Identity Validation**
-* **Domain Handshake:** Successfully integrated the Windows 11 Pro workstation into the `LAB.local` forest.
-
-* **Trust Verification:** Utilized `sysdm.cpl ` to verify the trust relationship between the client and the Domain Controller.
-<img width="1019" height="770" alt="Screenshot 2026-04-16 021037" src="https://github.com/user-attachments/assets/d12d04fc-bf09-4a27-849a-154be0d4966e" />
+<img width="1017" height="863" alt="Trust Validation" src="https://github.com/user-attachments/assets/693683f2-6978-4ab6-8fc1-a1a5cc2a3a04" />
 
 
+## **Phase 4: Enterprise Resource Management & Identity-Based Access**
+I transitioned the lab from basic file sharing to an Identity-Based Access Control (IBAC) model, simulating how a Tier 2 SysAdmin manages corporate data at scale.
 
-## **Phase 4: Resource Management (The "Help Desk" Scenario)**
-I implemented departmental file sharing to simulate a corporate environment using a combination of GPO and scripting. 
+* **Scalable OU & Group Architecture:** Abandoned flat structures in favor of a tiered OU hierarchy. I separated Administrative Accounts from Standard Accounts and centralized permissions into dedicated Security Groups (e.g., `SG_Finance_Users`, `SG_IT_Admins`).
 
-* **Folder Permissions:** Configured NTFS and Share permissions to restrict access based on security groups.
-* **Mapped Drives:** Verified that the IT user automatically received the correct network drive upon login.
-<img width="1022" height="775" alt="Screenshot 2026-04-16 023656" src="https://github.com/user-attachments/assets/6f797efb-e9d6-4ddd-8fb8-ffac5c10e076" />
+* **Dynamic Drive Mapping via GPP:** Replaced legacy `.bat` logon scripts with modern Group Policy Preferences (GPP). I utilized Item-Level Targeting and Security Filtering to ensure that a single GPO dynamically maps resources only to authorized users.
 
-* **Automated Drive Mapping:** Authored and deployed `.bat` logon scripts via Group Policy to dynamically map the `B:` drive based on the user's specific department.
-<img width="1025" height="780" alt="logon_propertities" src="https://github.com/user-attachments/assets/f043dff9-853d-4e3a-aeac-f166b3080b44" />
-<img width="1019" height="773" alt="script" src="https://github.com/user-attachments/assets/29304439-ce85-47cd-9308-684fae8337b4" />
-<img width="1025" height="772" alt="Screenshot 2026-04-15 154914" src="https://github.com/user-attachments/assets/7fe0b71f-fb9d-46c3-a876-6b8b316f54e3" />
+* **Access-Based Enumeration (ABE):** Implemented ABE on the global `\\DC01\Shares` root. This ensures "Security through Obscurity" by hiding folders (HR, IT, Finance) from any user who does not have explicit NTFS Read permissions, preventing internal reconnaissance.
 
-* **Security Isolation**: Verified that while the drive is mapped via GPO, users are strictly blocked from accessing the folders outside their assigned security group.
-<img width="1024" height="773" alt="Screenshot 2026-04-16 030320" src="https://github.com/user-attachments/assets/ae4a29bd-2728-48e3-8132-5603cb0dbd44" />
+* **Verification:** As shown below, `John Wick (Finance)` can only see the Finance directory, while `Raimi (IT Admin)` has full visibility into all departmental archives.
+
+<img width="1023" height="770" alt="Finance only" src="https://github.com/user-attachments/assets/e683699f-e3a3-4723-835d-3af31d66d5b0" />
+
+<img width="1026" height="772" alt="IT Admin" src="https://github.com/user-attachments/assets/187e2b29-3ce6-4a22-b5a5-6da512aa7db9" />
+
+### **Granular Permission Audit (NTFS Verification)**
+To validate that the Principle of Least Privilege was successfully applied beyond just visibility, I utilized the Effective Access tool to audit specific NTFS permissions for the Finance directory.
+
+* **Administrative Oversight:** Confirmed that `IT_Admin` (Raimi) retains Full Control, ensuring administrative continuity and the ability to manage data lifecycle.
+
+* **Restricted Management:** Verified that `Finance_Manager` (John Wick) has necessary Read/Write access but is strictly denied the ability to change permissions or take ownership. This prevents accidental or malicious privilege escalation within the department.
+
+<img width="1021" height="773" alt="effective access 2" src="https://github.com/user-attachments/assets/76202c6b-bac2-42f9-a3cc-8b890cf14bf6" />
+
+<img width="1021" height="764" alt="effetive access" src="https://github.com/user-attachments/assets/e241c65b-8c83-4cb9-990b-a5f1d628566f" />
 
 
 ## **Phase 5: Network Services & Security Hardening**
-To transition the lab from a basic setup to a secure enterprise environment, I implemented critical infrastructure services and defensive policies.
+To transition the lab into a "Hardened" state, I implemented centralized networking and defensive auditing policies.
 
-* **DHCP Server Deployment:** Configured a managed DHCP scope on the Domain Controller. Verified successful IP allocation (192.168.56.103) to the Windows 11 client via the DHCP Lease console and client-side `ipconfig` verification.
-<img width="1026" height="778" alt="Screenshot 2026-04-16 011442" src="https://github.com/user-attachments/assets/e86d8545-fb50-4c87-bc14-9a9e6028a9c8" />
+### **Centralized Network Management (DHCP)**
 
-* **Transition to Automated Networking:** Migrated the client from a static configuration to a dynamic DHCP-managed environment. As shown in the `ipconfig` results, the client now automatically receives its IP allocation and DNS pointers from the Domain Controller, ensuring centralized network management.
-<img width="511" height="385" alt="Screenshot 2026-04-16 011944" src="https://github.com/user-attachments/assets/0fc28295-5dc7-4d60-a485-0fc4e1827690" />
+* **Managed Infrastructure:** Deployed a managed DHCP Scope (192.168.56.100 - 192.168.56.200) on the Domain Controller to eliminate static IP overhead.
+ 
+* **DNS Infrastructure Integration:** Configured DHCP Option 006 (DNS Servers) to automatically assign the Domain Controller’s IP (192.168.56.10) to all network clients. This ensures seamless Active Directory service discovery and reliable Kerberos authentication across the forest.
+ 
+* **Validation:** Verified the "Handshake" by migrating the Windows 11 client to a dynamic lease.
 
-* **Brute-Force Protection:** Authored a "Security_Hardening_Policy" GPO to enforce an **Account Lockout Threshold** of 3 attempts.
-<img width="1029" height="777" alt="Screenshot 2026-04-16 012238" src="https://github.com/user-attachments/assets/359a1ba4-9257-4bc7-8557-4d7604b5ea2a" />
+<img width="1022" height="766" alt="DHCP Handshake" src="https://github.com/user-attachments/assets/ee4e36af-523e-4b26-88e4-6b419c2858f0" />
+
+<img width="1018" height="764" alt="DNS Server 006" src="https://github.com/user-attachments/assets/ae4501ab-1528-415c-a152-2f35c2229dd2" />
 
 
-* **Defensive Verification:** Successfully triggered and verified a lockout event on the Windows 11 workstation after multiple failed authentication attempts, simulating a real-world response to a brute-force attack.
-<img width="1032" height="777" alt="Screenshot 2026-04-16 012354" src="https://github.com/user-attachments/assets/d0a8e517-6988-47c7-9d7c-45f56b98f62d" />
+### **Brute-Force Mitigation & GPO Hardening** 
+
+* **Strategy:** Authored and enforced a "GPO Security Hardening Baseline" to mitigate automated credential-stuffing and brute-force attacks.
+
+* **Policy Configuration:** Enforced an Account Lockout Threshold of 3 failed attempts with a 30-minute reset window.
+
+<img width="1022" height="766" alt="Security hardening GPO" src="https://github.com/user-attachments/assets/495f4397-a681-4e21-a365-7dd530897783" />
 
 
-## **Phase 6: Application Support & Disaster Recovery**
-To simulate a Junior IT Engineer's daily responsibilities, I managed a local mail infrastructure and implemented a platform-agnostic disaster recovery plan for end-user data. 
+### **Security Auditing & Incident Simulation**
+
+* **The Attack Simulation:** Triggered a deliberate lockout on the Windows 11 workstation after exceeding the authorized logon attempts.
+
+* **The Forensic Chain:** Configured the Audit Account Management policy to track identity-based threats.
+
+* **Log Correlation:** Successfully correlated Event ID 4740 in the Domain Controller’s Security Log, proving the "Detection-to-Action" pipeline is fully operational.
+
+<img width="1016" height="757" alt="AC Lockout" src="https://github.com/user-attachments/assets/74945b68-ca9e-445b-8dc9-9463e59fd2ba" />
+
+<img width="1026" height="776" alt="Audit Policy" src="https://github.com/user-attachments/assets/3439bbc0-7784-4522-916e-efec77589c7b" />
+
+<img width="1022" height="769" alt="AC Lockout Eventviewer" src="https://github.com/user-attachments/assets/7bd103df-42d4-4af5-b01d-de7809e9702f" />
+
+
+## **Phase 6: Endpoint Engineering & Data Resiliency**
+**Objective:** Simulating Tier 2 support operations by managing application lifecycles and implementing robust Disaster Recovery (DR) workflows for end-user data.
 
 * **Logic-Based Troubleshooting:** Demonstrated that technical support principles are transferable across platforms. While utilizing Thunderbird for this lab, the methodology applied (Profile Management and Configuration File manipulation) directly simulates enterprise Microsoft Outlook troubleshooting (e.g., resolving .PST/.OST corruption).
 
