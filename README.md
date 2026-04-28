@@ -39,15 +39,15 @@ To ensure security and isolation, I implemented a dual-adapter network topology.
 
 
 ## **Phase 2: Active Directory Architecture & Identity Design**
-**Objective:** Establishing a scalable, enterprise-grade Identity and Access Management (IAM) foundation within the LAB.local forest.
+**Objective:** Establishing a scalable, enterprise-grade **Identity and Access Management (IAM)** foundation within the `LAB.local forest`.
 
 ### **Hierarchical Organizational Unit (OU) Design**
 
-* **Scalable Framework:** Implemented a tiered OU structure to facilitate granular Group Policy application and administrative delegation.
+* **Scalable Framework:** Implemented a tiered OU structure to facilitate granular **Group Policy application** and **administrative delegation.**
 
-* **Separation of Concerns:** Isolated Administrative Accounts, Standard Accounts (departmentalized by Finance, HR, and IT), and Security Groups into distinct containers to prevent policy leakage.
+* **Separation of Concerns:** Isolated `Administrative Accounts`, `Standard Accounts (departmentalized by Finance, HR, and IT)`, and `Security Groups` into distinct containers to prevent policy leakage.
 
-* **Standardized Provisioning:** Developed an account naming and description convention to simulate enterprise auditing requirements, as seen in the profile for John Wick (Finance Manager).
+* **Standardized Provisioning:** Developed an account naming and description convention to simulate enterprise auditing requirements, as seen in the profile for `John Wick (Finance Manager)`.
 
 <img width="1023" height="774" alt="AD UC" src="https://github.com/user-attachments/assets/41251eb9-7c8a-42c7-b25d-5d2b0e54d966" />
 
@@ -56,23 +56,23 @@ To ensure security and isolation, I implemented a dual-adapter network topology.
 ## **Phase 3: Endpoint Enrollment & Trust Validation** 
 **Objective:** Securely integrating client assets into the domain and verifying the Kerberos trust relationship.
 
-* **Domain Handshake:** Successfully migrated the Windows 11 Pro workstation from a standalone workgroup to the LAB.local managed forest.
+* **Domain Handshake:** Successfully migrated the **Windows 11 Pro** workstation from a standalone workgroup to the `LAB.local` managed forest.
 
-* **Security Validation:** Utilized sysdm.cpl to verify the authoritative trust relationship between the endpoint (WS01.LAB.local) and the Domain Controller.
+* **Security Validation:** Utilized `sysdm.cpl` to verify the authoritative trust relationship between the endpoint **(WS01.LAB.local)** and the Domain Controller.
 
-* **Identity Handshake:** Confirmed that the workstation successfully honors domain credentials, allowing for centralized authentication and policy inheritance from the DC.
+* **Identity Handshake:** Confirmed that the workstation successfully honors domain credentials, allowing for centralized authentication and policy inheritance from the **DC**.
 
 <img width="1017" height="863" alt="Trust Validation" src="https://github.com/user-attachments/assets/693683f2-6978-4ab6-8fc1-a1a5cc2a3a04" />
 
 
 ## **Phase 4: Enterprise Resource Management & Identity-Based Access**
-I transitioned the lab from basic file sharing to an Identity-Based Access Control (IBAC) model, simulating how a Tier 2 SysAdmin manages corporate data at scale.
+I transitioned the lab from basic file sharing to an **Identity-Based Access Control (IBAC)** model, simulating how a **Tier 2 SysAdmin** manages corporate data at scale.
 
-* **Scalable OU & Group Architecture:** Abandoned flat structures in favor of a tiered OU hierarchy. I separated Administrative Accounts from Standard Accounts and centralized permissions into dedicated Security Groups (e.g., `SG_Finance_Users`, `SG_IT_Admins`).
+* **Scalable OU & Group Architecture:** Abandoned flat structures in favor of a tiered OU hierarchy. I separated `Administrative Accounts` from `Standard Accounts` and centralized permissions into dedicated `Security Groups` (e.g., `SG_Finance_Users`, `SG_IT_Admins`).
 
-* **Dynamic Drive Mapping via GPP:** Replaced legacy `.bat` logon scripts with modern Group Policy Preferences (GPP). I utilized Item-Level Targeting and Security Filtering to ensure that a single GPO dynamically maps resources only to authorized users.
+* **Dynamic Drive Mapping via GPP:** Replaced legacy `.bat` logon scripts with modern **Group Policy Preferences (GPP)**. I utilized **Item-Level Targeting** and **Security Filtering** to ensure that a single **GPO** dynamically maps resources only to authorized users.
 
-* **Access-Based Enumeration (ABE):** Implemented ABE on the global `\\DC01\Shares` root. This ensures "Security through Obscurity" by hiding folders (HR, IT, Finance) from any user who does not have explicit NTFS Read permissions, preventing internal reconnaissance.
+* **Access-Based Enumeration (ABE):** Implemented ABE on the global `\\DC01\Shares` root. This ensures "Security through Obscurity" by hiding folders **(HR, IT, Finance)** from any user who does not have explicit **NTFS** **Read** permissions, preventing internal reconnaissance.
 
 * **Verification:** As shown below, `John Wick (Finance)` can only see the Finance directory, while `Raimi (IT Admin)` has full visibility into all departmental archives.
 
@@ -81,11 +81,11 @@ I transitioned the lab from basic file sharing to an Identity-Based Access Contr
 <img width="1026" height="772" alt="IT Admin" src="https://github.com/user-attachments/assets/187e2b29-3ce6-4a22-b5a5-6da512aa7db9" />
 
 ### **Granular Permission Audit (NTFS Verification)**
-To validate that the Principle of Least Privilege was successfully applied beyond just visibility, I utilized the Effective Access tool to audit specific NTFS permissions for the Finance directory.
+To validate that the **Principle of Least Privilege** was successfully applied beyond just visibility, I utilized the **Effective Access** tool to audit specific **NTFS permissions** for the `Finance` directory.
 
-* **Administrative Oversight:** Confirmed that `IT_Admin` (Raimi) retains Full Control, ensuring administrative continuity and the ability to manage data lifecycle.
+* **Administrative Oversight:** Confirmed that `IT_Admin` (Raimi) retains **Full Control**, ensuring administrative continuity and the ability to manage data lifecycle.
 
-* **Restricted Management:** Verified that `Finance_Manager` (John Wick) has necessary Read/Write access but is strictly denied the ability to change permissions or take ownership. This prevents accidental or malicious privilege escalation within the department.
+* **Restricted Management:** Verified that `Finance_Manager` (John Wick) has necessary `Read/Write` access but is strictly denied the ability to change permissions or take ownership. This prevents accidental or malicious privilege escalation within the department.
 
 <img width="1021" height="773" alt="effective access 2" src="https://github.com/user-attachments/assets/76202c6b-bac2-42f9-a3cc-8b890cf14bf6" />
 
@@ -112,7 +112,7 @@ To transition the lab into a **"Hardened"** state, I implemented centralized net
 
 * **Strategy:** Authored and enforced a **"GPO Security Hardening Baseline"** to mitigate automated credential-stuffing and brute-force attacks.
 
-* **Policy Configuration:** Enforced an Account Lockout Threshold of 3 failed attempts with a 30-minute reset window.
+* **Policy Configuration:** Enforced an **Account Lockout Threshold** of **3 failed attempts** with a **30-minute** reset window.
 
 <img width="1022" height="766" alt="Security hardening GPO" src="https://github.com/user-attachments/assets/495f4397-a681-4e21-a365-7dd530897783" />
 
@@ -123,7 +123,7 @@ To transition the lab into a **"Hardened"** state, I implemented centralized net
 
 * **The Forensic Chain:** Configured the **Audit Account Management** policy to track identity-based threats.
 
-* **Log Correlation:** Successfully correlated Event ID 4740 in the Domain Controller’s Security Log, proving the "Detection-to-Action" pipeline is fully operational.
+* **Log Correlation:** Successfully correlated `Event ID 4740` in the **Domain Controller’s Security Log**, proving the "Detection-to-Action" pipeline is fully operational.
 
 <img width="1016" height="757" alt="AC Lockout" src="https://github.com/user-attachments/assets/74945b68-ca9e-445b-8dc9-9463e59fd2ba" />
 
@@ -136,9 +136,9 @@ To transition the lab into a **"Hardened"** state, I implemented centralized net
 **Objective:** Implementing enterprise-grade data protection through automation and surgical recovery methods. 
 
 ### **Task A: Automated Endpoint Migration**
-* **Action:** Deployed a PowerShell script to migrate "Critical Project" data from local user desktops to the centralized **S: Drive**.
+* **Action:** Deployed a **PowerShell** script to migrate "Critical Project" data from local user desktops to the centralized `S: Drive`.
 
-* **Impact:** Eliminated local data silos and ensured all business-critical files are included in server-side backup rotations.
+* **Impact:** Consolidated local data into a centralized server to ensure 100% backup coverage for all critical business files.
 
 <img width="1021" height="766" alt="Script" src="https://github.com/user-attachments/assets/093bab95-0e5a-4bae-b1dd-ef5c7b97ff40" />
 
@@ -146,15 +146,15 @@ To transition the lab into a **"Hardened"** state, I implemented centralized net
 
 * **Action:** Identified vulnerable legacy accounting data and migrated it to a **Hidden Administrative Share** (`Secure_Archives$`).
 
-* **Impact:** Reduced the attack surface by hiding the share from standard network discovery and enforcing IT-Admin-only access.
+* **Impact:** Reduced the attack surface by hiding the share from standard network discovery and enforcing `IT-Admin-only` access.
 
 <img width="1020" height="769" alt="Legacy migration" src="https://github.com/user-attachments/assets/cf3c023e-da90-42fa-9777-56b4d8870500" />
 
 ### **Task C: Disaster Recovery (VSS)**
 
-* **Action:** Configured Volume Shadow Copy Service (VSS) for point-in-time recovery.
+* **Action:** Configured **Volume Shadow Copy Service (VSS)** for point-in-time recovery.
 
-* **Impact:** Enabled self-service "Previous Version" restoration, significantly reducing Helpdesk RTO (Recovery Time Objective) for accidental deletions.
+* **Impact:** Enabled self-service **"Previous Version"** restoration, significantly reducing **Helpdesk RTO (Recovery Time Objective)** for accidental deletions.
 
 <img width="1020" height="774" alt="Shadowcopies" src="https://github.com/user-attachments/assets/e7af4c88-86fe-4a4b-ae1e-fd2b17f341fe" />
 
@@ -162,70 +162,77 @@ To transition the lab into a **"Hardened"** state, I implemented centralized net
 
 
 ## **Phase 7: Infrastructure Health & Validation**
-**Objective:** Final validation of Domain integrity and performance baselining.
+**Objective:** Final validation of **Domain integrity** and **performance baselining**.
 
 ### **Active Directory Health Audit:**
-Executed `dcdiag` to verify forest connectivity, advertising, and replication status. All tests passed.
+Executed `dcdiag` to verify forest **connectivity**, **advertising**, and **replication** status. All tests passed.
 
 <img width="1019" height="771" alt="dcdiag" src="https://github.com/user-attachments/assets/bc3fc8cf-e123-4b35-9e8d-4068fea5ba9c" />
 
 
 ### **Perfomance Monitoring:**
-Utilized **Resource Monitor** to baseline network and disk I/O, ensuring no bottlenecks exist within the virtualized environment.
+Utilized **Resource Monitor** to baseline network and `disk I/O`, ensuring no bottlenecks exist within the virtualized environment.
 
 <img width="1019" height="766" alt="resmon" src="https://github.com/user-attachments/assets/dfbd871b-fd10-4502-93a2-39cfb43c306a" />
 
 
-## **Phase 8: SIEM Integration & Real-Time Monitoring**
-To transition from reactive troubleshooting to proactive monitoring, I deployed a Splunk SIEM environment to centralize logs from across the domain. 
+## **Phase 8: Monitoring with Splunk (SIEM Integration)**
+The goal of this phase is to centralize all security logs into one place so I could monitor the entire lab from a single dashboard.
 
-## **Indexer Setup (Server VM)**
-* **Networking:** Enabled TCP 9997 to receive data from the Universal Forwarder
-<img width="1023" height="773" alt="Splunk_Indexer_Setup" src="https://github.com/user-attachments/assets/f73e062c-4d95-4061-ac94-72d276b555a0" />
+### **The Setup: Building the Data Bridge**
+To get the logs from my **Windows 11** machine to the **Splunk Server**, I had to configure a **"Handshake"** between them:
 
-* **Configuration:** Manually tuned `inputs.conf` to monitor local Security, System, and Application logs, providing 100% visibility into Domain Controller activity.
-<img width="1025" height="768" alt="Screenshot 2026-04-18 221938" src="https://github.com/user-attachments/assets/9f1422fb-f3ee-4685-ad8a-5dced0bc049a" />
+#### **The Receiver:**
+I configured the **Splunk Indexer** to listen on `Port 9997`. Think of this as opening a specific door on the server for security data to enter.
+
+<img width="1021" height="767" alt="Screenshot 2026-04-28 220418" src="https://github.com/user-attachments/assets/03add844-d95a-478b-b044-74a6bb9def11" />
+
+#### **The Agent & Connection:**
+I installed the **Splunk Universal Forwarder** on the workstation. I then used the command line to verify the **"Handshake,"** confirming the agent was actively forwarding data to the server at `192.168.56.10:9997`.
+
+<img width="1022" height="770" alt="Screenshot 2026-04-28 222349" src="https://github.com/user-attachments/assets/b761e3ea-2f8c-4bc6-9aee-407e8040b7d9" />
 
 
-* **Endpoint Agent (Windows 11 VM):** Deployed the Splunk Universal Forwarder. Configured the agent to push Windows Event Logs (Security, System, Application) to the Indexer.
-<img width="1026" height="770" alt="Screenshot 2026-04-18 221557" src="https://github.com/user-attachments/assets/fa55cfe2-dd05-41b0-b79a-cda136b44b06" />
+### **Security Alerts & Activity Catching** 
+Once the bridge was built, I tested it by performing actions that look like "hacker" activity to see if **Splunk** would catch them:
 
+#### **High-Privilege Login (Event 4672)**
+I tracked when an account with **"Super User"** powers logged in. This is a red flag if it’s an account that shouldn't have **administrative access**.
 
-* **Data Pipeline Verfication:** Confirmed active data flow by quering `index=main` and verifying the presence of both `LAB-DC01` and `LAB-WS01` as active hosts.
-<img width="1022" height="767" alt="Screenshot 2026-04-18 201315" src="https://github.com/user-attachments/assets/ce07cc56-8baf-4103-a574-9c5876a873f5" />
+* **Result:** Splunk caught the `"Attack_Account"` logging in with special system-level privileges.
 
-## **Case Study: Incident Response (The "Locked-Out User")**
-**Scenario:** A user reports they are locked out of their workstation. As a Junior IT Engineer, I used the SIEM to perform a Root Cause Analysis. 
+<img width="1023" height="771" alt="Screenshot 2026-04-28 220635" src="https://github.com/user-attachments/assets/9966c8d3-e722-4e62-b6ce-20725b8c05a2" />
 
-## **Detection** 
-I queried Splunk for `EventCode=4740`. This instantly identified that the account `IT_Admin` was locked out by the Domain Controller. 
-<img width="1022" height="772" alt="Splunk_Scenario_2" src="https://github.com/user-attachments/assets/fc09a027-2c5d-4544-89a3-3e3b1e3d7c24" />
-<img width="1021" height="773" alt="Splunk_Scenario_1" src="https://github.com/user-attachments/assets/57b93861-bef4-48e2-b5b3-b51183d817fc" />
+#### **PowerShell Command Logging (Event 4104)**
+I enabled a setting that records exactly what is typed into the **PowerShell** window. This is perfect for seeing if someone is trying to run malicious scripts.
 
-## **Forensics**
-By analyzing `EventCode=4625` (Logon Failure), I confirmed the source was the Windows 11 workstation. This allowed me to rule out a network-wide attack and focus on the local machine.
-<img width="1023" height="776" alt="Splunk_Scenario_3" src="https://github.com/user-attachments/assets/006e868e-7442-47c4-99c2-0a28c462bacb" />
+* **Result:** I created a simple table that clearly lists the **time**, the **computer name**, and the exact **command** that was run.
 
-## **Resolution** 
-I performed a manual account unlock in Active Directory and verified the user could re-authenticate successfully.
-<img width="1015" height="773" alt="Splunk_Scenario_4" src="https://github.com/user-attachments/assets/2f1ea630-9897-4530-bb01-f8c628266286" />
+<img width="1020" height="772" alt="Screenshot 2026-04-28 225953" src="https://github.com/user-attachments/assets/e4687b41-e2ac-4e1a-abd2-143c80ee64a5" />
+
+### **New Service Created (Event 7045)**
+I monitored for the creation of new services, which is a common technique used by attackers to establish **"persistence"** allowing their malicious programs to run automatically in the background.
+
+* **Result:** I captured a successful alert showing the exact name of the new service `(SplunkTestService)` and the file path it used `(C:\Windows\System32\cmd.exe)`, allowing me to identify unauthorized background installations.
+
+<img width="1023" height="769" alt="Screenshot 2026-04-28 221455" src="https://github.com/user-attachments/assets/90e91f71-c032-4f0c-9689-d6840beac2aa" />
+
 
 ## **Phase 9: Patch Management & Compliance (WSUS)**
-To transition the lab from an "unmanaged" environment to a governed enterprise network, I deployed **Windows Server Update Services (WSUS)** on the Domain Controller.
+To transition the lab from an **"unmanaged"** environment to a governed enterprise network, I deployed **Windows Server Update Services (WSUS)** on the **Domain Controller**.
 
 ### **Policy-Driven Updates (GPO):**
-Configured Group Policy Objects to redirect the workstation to the local update server. As shown in the client-side view, the "managed" status is verified by the system blocking manual user overrides.
+Configured `Group Policy Objects` to redirect the workstation to the local update server. As shown in the client-side view, the "managed" status is verified by the system blocking manual user overrides.
 
 <img width="1022" height="772" alt="Screenshot 2026-04-23 153748" src="https://github.com/user-attachments/assets/33dc9617-9d7d-49b7-9bd3-004eb0cd469c" />
 
-
 ### **Centralized Administration:** 
-Utilized the WSUS console to organize assets into a dedicated `Lab_Workstations` group. Successfully synchronized 335 updates, achieving a 99% patch compliance rate across the domain.
+Utilized the WSUS console to organize assets into a dedicated `Lab_Workstations` group. Successfully synchronized **335 updates**, achieving a 99% patch compliance rate across the domain.
 
 <img width="1019" height="773" alt="Screenshot 2026-04-23 154418" src="https://github.com/user-attachments/assets/c816b4c9-e744-47f7-bae9-cca8b415e7b2" />
 
 ### **Infrastructure Troubleshooting & Reporting:** 
-Resolved a critical dependency issue involving legacy SQL CLR and Report Viewer runtimes on Server 2022. This enabled the generation of "Computer Detailed Status Reports," providing actionable security audits for stakeholders.
+Resolved a critical dependency issue involving legacy **SQL CLR** and **Report Viewer** runtimes on `Server 2022`. This enabled the generation of **"Computer Detailed Status Reports,"** providing actionable security audits for stakeholders.
 
 <img width="1023" height="772" alt="Screenshot 2026-04-23 162445" src="https://github.com/user-attachments/assets/c0abd013-f72a-4125-b2b2-19513d58f73d" />
 
@@ -270,5 +277,5 @@ Resolved a critical dependency issue involving legacy SQL CLR and Report Viewer 
 
 ## **Future Enhancements**
 To further expand this lab, I plan to implement:
-* **[Item-Level Targeting](docs/GPO_Optimization.md):** Consolidating multiple department rules into a single, high-efficiency GPO.
-* **[VPN & Remote Access](docs/VPN_Configuration.md):** Configuring a Routing and Remote Access Service (RRAS) to simulate secure remote work.
+* **[Item-Level Targeting]:** Consolidating multiple department rules into a single, high-efficiency GPO.
+* **[VPN & Remote Access]:** Configuring a Routing and Remote Access Service (RRAS) to simulate secure remote work.
