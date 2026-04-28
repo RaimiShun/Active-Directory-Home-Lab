@@ -68,11 +68,23 @@ To ensure security and isolation, I implemented a dual-adapter network topology.
 ## **Phase 4: Enterprise Resource Management & Identity-Based Access**
 I transitioned the lab from basic file sharing to an **Identity-Based Access Control (IBAC)** model, simulating how a **Tier 2 SysAdmin** manages corporate data at scale.
 
-* **Scalable OU & Group Architecture:** Abandoned flat structures in favor of a tiered OU hierarchy. I separated `Administrative Accounts` from `Standard Accounts` and centralized permissions into dedicated `Security Groups` (e.g., `SG_Finance_Users`, `SG_IT_Admins`).
+### **Scalable OU & Group Architecture:** 
+Abandoned flat structures in favor of a tiered OU hierarchy. I separated `Administrative Accounts` from `Standard Accounts` and centralized permissions into dedicated `Security Groups` (e.g., `SG_Finance_Users`, `SG_IT_Admins`).
 
-* **Dynamic Drive Mapping via GPP:** Replaced legacy `.bat` logon scripts with modern **Group Policy Preferences (GPP)**. I utilized **Item-Level Targeting** and **Security Filtering** to ensure that a single **GPO** dynamically maps resources only to authorized users.
+### **Dynamic Drive Mapping via GPP & Item-Level Targeting:** 
+Replaced legacy `.bat` logon scripts with modern **Group Policy Preferences (GPP)**. I consolidated multiple departmental policies into a single, high-efficiency GPO that utilizes **Item-Level Targeting** to dynamically map the `S: Drive` based on the user's specific Security Group membership.
 
-* **Access-Based Enumeration (ABE):** Implemented ABE on the global `\\DC01\Shares` root. This ensures "Security through Obscurity" by hiding folders **(HR, IT, Finance)** from any user who does not have explicit **NTFS** **Read** permissions, preventing internal reconnaissance.
+* **The Logic:** The GPO evaluates group membership (e.g., LAB\SG_HR) at logon before applying the mapping.
+
+* **The Validation:** Verified with a test user **(Sarah Potter)**, ensuring the drive only maps once the security token is refreshed.
+
+<img width="1020" height="767" alt="Screenshot 2026-04-29 020044" src="https://github.com/user-attachments/assets/058b713f-e00d-478b-81fc-82e5dcf0c39d" /> 
+
+<img width="1026" height="768" alt="Screenshot 2026-04-29 022850" src="https://github.com/user-attachments/assets/c4edf13e-1901-4351-b9b1-ab59eb16e965" />
+
+
+### **Access-Based Enumeration (ABE):** 
+Implemented ABE on the global `\\DC01\Shares` root. This ensures "Security through Obscurity" by hiding folders **(HR, IT, Finance)** from any user who does not have explicit **NTFS** **Read** permissions, preventing internal reconnaissance.
 
 * **Verification:** As shown below, `John Wick (Finance)` can only see the Finance directory, while `Raimi (IT Admin)` has full visibility into all departmental archives.
 
@@ -248,10 +260,7 @@ Resolved a critical dependency issue involving legacy **SQL CLR** and **Report V
 * **Issue:** Kerberos Time Skew. Encountered an error where the computer clock was not synchronized with the Domain Controller.
    *   **Solution**: Identified a VM clock drift mismatch and utilized `w32tm /resync` to align the client with the DC's NTP source
       * **Security:** Implemented Account Lockout Policies to mitigate brute-force attacks.
-       
-* **Issue:** Application setup blocked by non-standard network environment (Thunderbird Wizard)
-   *   **Solution:** Utilized the Profile Manager (`P` flag) and Advanced Configuration toggles to initialize the application database manually, ensuring laboratory tasks could proceed despite UI limitations.
-
+      
 * **Issue:** GPO settings (Audit Policies) were not applying to the Windows 11 workstation.
     * **Root Cause:** The workstation was located in the default "Computers" container, which does not                            support GPO linking.
     * **Solution:** Created a dedicated Workstation OU, moved the computer object, and performed a                              `gpupdate /force` to successfully trigger policy inheritance.
@@ -277,5 +286,4 @@ Resolved a critical dependency issue involving legacy **SQL CLR** and **Report V
 
 ## **Future Enhancements**
 To further expand this lab, I plan to implement:
-* **[Item-Level Targeting]:** Consolidating multiple department rules into a single, high-efficiency GPO.
 * **[VPN & Remote Access]:** Configuring a Routing and Remote Access Service (RRAS) to simulate secure remote work.
