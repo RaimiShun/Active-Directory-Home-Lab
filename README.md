@@ -12,19 +12,21 @@ The goal of this project was to build a functional, secure enterprise network en
 | **SIEM & Monitoring** | Splunk Enterprise, Universal Forwarder, Sysmon, Log Correlation |
 | **Infrastructure** | DHCP, DNS, Network Mapping, Virtualization (Oracle VM) |
 | **Incident Response** | Root Cause Analysis, Forensics, Log Aggregation, Troubleshooting |
+| **Remote Access** | VPN (L2TP/IPsec), RRAS, NPS, Perimeter Security |
 
 ## **Technologies Used**
 * **Hypervisor:** Oracle VirtualBox
 * **Operating Systems:** Windows Server 2022, Windows 11 Pro
-* **Services:** Active Directory Domain Services (AD DS), DNS, SMB File Sharing, Group Policy (GPO)
+* **Services:** Active Directory Domain Services (AD DS), DNS, SMB File Sharing, Group Policy (GPO), Routing & Remote Access (RRAS), Network Policy Server (NPS)
 * **Monitoring/SIEM:** Splunk Enterprise (Indexer), Splunk Universal Forwarder (Agent)
 
 ## **Lab Asset Inventory**
 | Asset Name | Operating System | Role / Service | Network Configuration |
 | :--- | :--- | :--- | :--- |
-| **LAB-DC01** | Windows Server 2022 | Domain Controller, DNS, DHCP, WSUS | Static: 192.168.56.10 |
-| **LAB-WS01** | Windows 11 Pro | Client Workstation | DHCP Assigned |
+| **LAB-DC01** | Windows Server 2022 | Domain Controller, DNS, DHCP, WSUS, VPN Gateway | Static: 192.168.56.10 |
+| **LAB-WS01** | Windows 11 Pro | Client Workstation | Interal Network (LabNet) |
 | **S: Drive** | SMB Share | Centralized User Backups | Hosted on DC01 |
+| **VPN Pool** | Virtual Interface | Remote Client Access | 10.0.0.100 - 10.0.0.150 | 
 
 
 ## **Phase 1: Network Architecture** 
@@ -248,9 +250,32 @@ Resolved a critical dependency issue involving legacy **SQL CLR** and **Report V
 
 <img width="1023" height="772" alt="Screenshot 2026-04-23 162445" src="https://github.com/user-attachments/assets/c0abd013-f72a-4125-b2b2-19513d58f73d" />
 
+## **Phase 10: Remote Access & VPN Implementation**
+**Objective:** Bridging the gap between the internal lab and the outside world. I implemented a secure entry point to allow remote users to "dial-in" and access corporate resources as if they were sitting in the office.
+
+### **The Architecture: Secure Remote Connectivity** 
+* **Service:** Configured **Routing and Remote Access Service (RRAS)** on the Domain Controller to act as a **Full-Tunnel VPN Gateway**. By routing all remote traffic through this secure perimeter, the organization ensures centralized monitoring and security auditing of all external web activity.
+
+* **Authentication:** Leveraged **Active Directory (AD DS)** for native identity verification, ensuring that only users with explicit "Dial-in" permissions can establish a tunnel.
+
+* **Identity-Based Access:** Used **Network Policy Server (NPS)** to validate user credentials against the forest, maintaining a unified security posture for both local and remote endpoints.
 
 
+### **Validation & Proof of Concept**
+#### **Identity Verification:** 
+Configured specific **"Dial-in"** permissions for `Sarah Potter` in Active Directory, verifying that the VPN acts as a gatekeeper for corporate network resources.
 
+<img width="1018" height="769" alt="Screenshot 2026-04-30 025012" src="https://github.com/user-attachments/assets/b0a4aaf7-0e74-4723-80a3-d7e00401c679" />
+
+#### **Connectivity Audit:**
+Utilized `ipconfig` to confirm a successful VPN handshake, resulting in the acquisition of a virtualized tunnel IP address (`10.0.0.102`).
+
+<img width="1021" height="769" alt="Screenshot 2026-04-30 024948" src="https://github.com/user-attachments/assets/20ed754c-a6a5-4390-a92e-8945d3c5cff1" />
+
+### **Resource Access:** 
+Verified that the remote client successfully mapped the HR (`S:`) drive over the encrypted tunnel, confirming that GPO-based file share mapping remains functional outside the local network perimeter.
+
+<img width="1021" height="767" alt="Screenshot 2026-04-30 015053" src="https://github.com/user-attachments/assets/809a504c-296c-4962-8a0f-f69429ee298c" />
 
 
 ## **Key Takeaways & Troubleshooting**
@@ -282,8 +307,17 @@ Resolved a critical dependency issue involving legacy **SQL CLR** and **Report V
 * **Issue:** Windows 11 client stuck at "Downloading 0%" from the local WSUS server.
    * **Solution:** Performed a SoftwareDistribution cache reset on the client machine and utilized `wuauclt /reportnow` to force a fresh handshake with the Domain Controller, resolving the hung                       update task.
 
+* **Issue:** Encountered routing conflicts when attempting to implement **Split Tunneling**.
+   * **Root Cause:** A gateway conflict between the NAT (Internet) adapter and the Internal (LAN) adapter                        caused the VPN handshake to fail.
+
+    * **Solution:** Pivoted to a **Full Tunnel** configuration. While this routes all traffic through the                       corporate gateway, it ensures that 100% of the remote client's traffic is subject to                        organizational security policies and monitoring, a preferred "Security First" approach.
+
+* **Issue:** VPN client was unable to resolve Domain names after connecting.
+   * **Solution:** Manually configured the VPN adapter's DNS settings to point directly to the DC’s                            internal IP (`10.0.0.1`), ensuring proper resolution of local resource names.
+
+ 
 ---
 
 ## **Future Enhancements**
 To further expand this lab, I plan to implement:
-* **[VPN & Remote Access]:** Configuring a Routing and Remote Access Service (RRAS) to simulate secure remote work.
+
