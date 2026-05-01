@@ -7,12 +7,12 @@ The goal of this project was to build a functional, secure enterprise network en
 ## **Core Competencies**
 | Competency Area | Key Technologies & Skills |
 | :--- | :--- |
-| **Identity & Access** | Active Directory (AD DS), OU Design, Group Policy (GPO) |
-| **Security & Auditing** | Account Lockout Policies, NTFS/Share Permissions, Hardening |
-| **SIEM & Monitoring** | Splunk Enterprise, Universal Forwarder, Sysmon, Log Correlation |
-| **Infrastructure** | DHCP, DNS, Network Mapping, Virtualization (Oracle VM) |
-| **Incident Response** | Root Cause Analysis, Forensics, Log Aggregation, Troubleshooting |
-| **Remote Access** | VPN (L2TP/IPsec), RRAS, NPS, Perimeter Security |
+| Identity & Access | Active Directory (AD DS), OU Design, Group Policy (GPO) |
+| Security & Auditing | Account Lockout Policies, NTFS/Share Permissions, Hardening |
+| SIEM & Monitoring | Splunk Enterprise, Universal Forwarder, Sysmon, Log Correlation |
+| Infrastructure | DHCP, DNS, Network Mapping, Virtualization (Oracle VM) |
+| Incident Response | Root Cause Analysis, Forensics, Log Aggregation, Troubleshooting |
+| Remote Access | VPN (L2TP/IPsec), RRAS, NPS, Perimeter Security |
 
 ## **Technologies Used**
 * **Hypervisor:** Oracle VirtualBox
@@ -23,10 +23,10 @@ The goal of this project was to build a functional, secure enterprise network en
 ## **Lab Asset Inventory**
 | Asset Name | Operating System | Role / Service | Network Configuration |
 | :--- | :--- | :--- | :--- |
-| **LAB-DC01** | Windows Server 2022 | Domain Controller, DNS, DHCP, WSUS, VPN Gateway | Static: 192.168.56.10 |
-| **LAB-WS01** | Windows 11 Pro | Client Workstation | Interal Network (LabNet) |
-| **S: Drive** | SMB Share | Centralized User Backups | Hosted on DC01 |
-| **VPN Pool** | Virtual Interface | Remote Client Access | 10.0.0.100 - 10.0.0.150 | 
+| LAB-DC01 | Windows Server 2022 | Domain Controller, DNS, DHCP, WSUS, VPN Gateway | Static: 192.168.56.10 |
+| LAB-WS01 | Windows 11 Pro | Client Workstation | Internal Network (LabNet) |
+| S: Drive | SMB Share | Centralized User Backups | Hosted on DC01 |
+| VPN Pool | Virtual Interface | Remote Client Access | 10.0.0.100 - 10.0.0.150 | 
 
 
 ## **Phase 1: Network Architecture** 
@@ -278,6 +278,28 @@ Verified that the remote client successfully mapped the HR (`S:`) drive over the
 <img width="1021" height="767" alt="Screenshot 2026-04-30 015053" src="https://github.com/user-attachments/assets/809a504c-296c-4962-8a0f-f69429ee298c" />
 
 
+## **Phase 11: Network Protocol Analysis & Forensic Verification**
+**Objective:** To validate the security of the domain authentication process and monitor the resource request lifecycle at the packet level using **Wireshark**.
+
+### **The Lifecycle of a Domain Login**
+By capturing traffic on the Domain Controller, I visualized the "Identity Handshake" that occurs when the Windows 11 workstation authenticates.
+
+### **Technical Protocol Breakdown** 
+| Protocol | Analysis & Observation |
+| :--- | :--- |
+| KRB5 (Kerberos) | **The Challenge-Response:** Captured the `AS-REQ` and subsequent `PREAUTH_REQUIRED` error. This confirms the DC is enforcing secure Pre-Authentication, a critical defense against offline password guessing. |
+| TGS-REQ | **Ticket Granting:** Observed the client requesting specific service tickets after successful login, proving the transition from identity verification to resource authorization. |
+| LDAP (SASL) | **Secure Directory Lookups:** Verified that the client queries Active Directory for Group Policy and user attributes using SASL encryption, ensuring sensitive directory data is not sent in cleartext. |
+| SMB2 | **File System Handshake:** Identified the exact moment the client established a connection to the `S:` drive, correlating the network traffic with the Group Policy Preferences (GPP) mapping. |
+| DCERPC | **Directory Replication:** Monitored the **DRSUAPI** interface, confirming the workstation is successfully synchronizing security descriptors with the Domain Controller. |
+
+
+<img width="1021" height="766" alt="Screenshot 2026-05-01 161939" src="https://github.com/user-attachments/assets/b5fec16c-f17b-4e02-b528-1cf4a7272517" />
+
+
+
+
+
 ## **Key Takeaways & Troubleshooting**
 * **Issue:** Encountered a "Version Mismatch" where Windows 11 Home could not join a domain.
    *   **Solution:** Successfully upgraded the VM to Windows 11 Pro to enable enterprise features.
@@ -315,9 +337,16 @@ Verified that the remote client successfully mapped the HR (`S:`) drive over the
 * **Issue:** VPN client was unable to resolve Domain names after connecting.
    * **Solution:** Manually configured the VPN adapter's DNS settings to point directly to the DC’s                            internal IP (`10.0.0.1`), ensuring proper resolution of local resource names.
 
+* **Issue:** `KRB5KDC_ERR_PREAUTH_REQUIRED` in packet captures.
+   * **Root Cause:** Initial Kerberos requests are sent without a timestamp to see if the KDC requires pre-                      authentication.
+   * **Solution:** Confirmed this as **Normal Behavior**. The subsequent `AS-REQ` included the encrypted                       timestamp, resulting in a successful login. This validated that the lab's security                          baseline for Kerberos is functioning as intended.
  
 ---
 
 ## **Future Enhancements**
 To further expand this lab, I plan to implement:
+* **Infrastructure as Code (IaC):** Automating the deployment of the lab using **Terraform** or **Ansible** to simulate rapid environment provisioning.
 
+* **Intrusion Detection (IDS/IPS):** Integrating **Suricata** or **Snort** to monitor for malicious network signatures between the Internal Network and the VPN gateway.
+
+* **Advanced Threat Simulation:** Using the **Mitre ATT&CK** framework to simulate specific adversary techniques (e.g., Golden Ticket attacks) and creating custom Splunk dashboards to detect them.
